@@ -20,6 +20,7 @@ export default class UserInput extends Component {
                     underlineColorAndroid="transparent"
                     {...otherProps}
                 />
+                 {/* <Image source={this.props.source} style={styles.rightImg} /> */}
             </View>
         );
     }
@@ -62,4 +63,5 @@ const styles = StyleSheet.create({
         left: 10,
         top: 9,
     },
+  
 });

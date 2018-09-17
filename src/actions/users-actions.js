@@ -1,10 +1,11 @@
-// export const UPDATE_USER = 'UPDATE_USER'
+import { UPDATE_USER } from '../constans/constans';
 
-// export default updateUser = (newUser) => {
-//     return {
-//         type: UPDATE_USER,
-//         playload: {
-//             user: newUser
-//         }
-//     }
-// }
+export default updateUser = (newUser, newPass) => {
+    return {
+        type: UPDATE_USER,
+        playload: {
+            userName: newUser,
+            password: newPass
+        }
+    }
+}

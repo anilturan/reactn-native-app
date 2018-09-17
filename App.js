@@ -4,8 +4,9 @@ import { Platform, StyleSheet, Text, View } from 'react-native';
 import HomeScreen from './src/components/Home';
 import { createStackNavigator } from 'react-navigation';
 // import { NavigationView } from 'react-navigation';
-
+import { Provider } from 'react-redux';
 import { YellowBox } from 'react-native';
+import store from './src/store/store'; //Import the store
 YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Module RCTImageLoader']);
 
 const instructions = Platform.select({
@@ -19,14 +20,12 @@ type Props = {};
 export default class App extends Component<Props> {
   render() {
     return (
-     <RootStack/>
-      // <View style={styles.container}>
-      //   {/* <Form /> */}
-      //   {/* <HomeScreen/> */}
-      //   {/* <Text style={styles.welcome}>Welcome Anıl!</Text>
-      //   <Text style={styles.instructions}>To get started, edit App.js</Text>
-      //   <Text style={styles.instructions}>{instructions}</Text> */}
-      // </View>
+      <Provider store={store} >
+        <React.Fragment>
+          <RootStack />
+        </React.Fragment >
+      </Provider>
+      // <RootStack />
     );
   }
 }

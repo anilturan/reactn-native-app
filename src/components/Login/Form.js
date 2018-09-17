@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, KeyboardAvoidingView, View, TouchableOpacity, Image, Button, TextInput } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Image, Button, AsyncStorage } from 'react-native';
 import UserInput from './UserInput';
 import usernameImg from '../../images/username.png';
 import passwordImg from '../../images/password.png';
@@ -7,9 +7,15 @@ import logo from '../../images/basecamp-logo.png';
 import eyeImg from '../../images/eye_black.png';
 // import CustomButton from './ButtonSubmit';
 import { get } from '../../httpRequest';
+// import { localAdd, localGet } from '../../localStorage';
+// import { LOGIN } from '../../constans/constans';
+// import { bindActionCreators } from 'redux';
+import { updateUser } from '../../actions/users-actions';
+// import user from '../../reducers/user/UserReducer';
+import { connect } from 'react-redux';
 
 
-export default class Form extends Component {
+class Form extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -18,116 +24,79 @@ export default class Form extends Component {
             password: '',
             name: '',
             isLogin: false,
+            data: ''
         }
         this.showPass = this.showPass.bind(this);
         this.onPress = this.onPress.bind(this);
-        this.textClear = this.textClear.bind(this);
-        // this.isLoginControl = this.isLoginControl.bind(this);
-
     }
+    // async componentDidMount() {
+    //     const intervalMillis = 3000;
+
+    //     //save something first
+    //     await AsyncStorage.setItem("test1", 'true');
+
+    //     setInterval(async () => {
+    //         console.log("Inside setInterval");
+    //         const value = await AsyncStorage.getItem('test1').then(value => this.setState({ isLogin: value }));
+    //         console.log(value);
+    //     }, intervalMillis);
+    // }
 
     showPass() {
         this.state.press === false
             ? this.setState({ showPass: false, press: true })
             : this.setState({ showPass: true, press: false });
+
     }
-    textClear = () => {
-        // this.refs.usernameRef.nodeValue=''
-        // this.usernameRef.clear();
-        let textInputusername = this.refs["textInputusername"];
-        textInputusername.clear;
+ 
+    // saveData(userName, password) {
+    //     const asd = {
+    //         name: userName,
+    //         password: password
+    //     }
+    //     localAdd('login', 'anil')
+    //     console.log(userName, password);
+    //     localGet('login')
+    // }
+    signUp(result) {
+        if (result.Result.EMail == this.state.name && result.Result.Password == this.state.password) {
+            // this.saveData(result.Result.EMail, result.Result.Password)
+            // this.props.updateUser('aa','123');
+            this.setState({
+                isLogin: true,
+                name: '',
+                password: '',
+            })
+            this.onLogin(this.state.isLogin);
+        }
+    }
+    onLogin(isLogin) {
+        console.log(isLogin, 'isLogin');
+        isLogin ? this.props.navigation.navigate('Home') : this.props.navigation.navigate('Login');
     }
     response = (result, error) => {
-        if (result != null) {
-            console.log(result.Result);
-            if (result.Result.EMail == this.state.name && result.Result.Password == this.state.password) {
-                this.setState({
-                    isLogin: true,
-                    name: '',
-                    password: '',
-                });
-                if (this.state.isLogin) {
-                    this.props.navigation.navigate('Home')
-                }
-                else {
-                    this.props.navigation.navigate('Login')
-                }
-            }
-            else {
-                alert('Kullanıcı adı veya şifre yanlış')
-            }
+        if (result.Result !== null) {
+            this.signUp(result)
         }
         else if (error != null) {
             console.log(error);
         }
         else {
-            console.log('Bir hata oluştu.');
+            alert('Kullanıcı adı veya şifre yanlış')
         }
     }
     bind = () => {
-        get(`http://b2bapi.telpa.com/api/GmAssistant/Login?eMail=${this.state.name}&password=${this.state.password}&culture=tr_TR`, this.response)
+        get(`url`, this.response)
     }
     onPress() {
-        // const islogin = this.state.password == '123' && this.state.name == 'anil'
-        // islogin ? this.props.navigation.navigate('Home') : this.props.navigation.navigate('Login');
         this.bind();
-        // if (this.state.isLogin) {
-        //     this.props.navigation.navigate('Home')
-        //     this.setState({
-        //         name: '',
-        //         password: '',
-        //     });
-        // }
-        // else {
-        //     this.props.navigation.navigate('Login')
-        // }
-
-
     }
-
-    // func = () => {
-
-    //     if (this.state.isLogin) {
-    //         this.props.navigation.navigate('Home')
-    //         this.setState({
-    //             name: '',
-    //             password: '',
-    //         });
-    //     }
-    //     else {
-    //         this.props.navigation.navigate('Login')
-    //     }
-    // }
-    // isLoginControl() {
-    //     alert(isLogin, "control")
-    //     // isLogin ? this.props.navigation.navigate('Home') : this.props.navigation.navigate('Login');
-    //     if (isLogin) {
-    //         this.props.navigation.navigate('Home')
-    //         this.setState({
-    //             name: '',
-    //             password: '',
-    //         });
-    //         alert(this.state.password)
-    //     }
-    //     else {
-    //         alert(this.state.password)
-
-    //         this.props.navigation.navigate('Login')
-    //     }
-    // }
     onBlur(e) {
 
         switch (e.target.name) {
             case 'name': this.setState({ name: e.target.value }); break;
             case 'password': this.setState({ password: e.target.value }); break;
         }
-    }
-    componentWillUnmount() {
-        this.setState({
-            name: '',
-            password: '',
-        });
-        // alert(this.state.password)
     }
     render() {
         const { name, password } = this.state
@@ -136,6 +105,7 @@ export default class Form extends Component {
         return (
             <View behavior="padding" style={styles.container}>
                 <Image source={logo} style={styles.logo} />
+
                 <UserInput
                     source={usernameImg}
                     placeholder="Name"
@@ -179,15 +149,41 @@ export default class Form extends Component {
     }
 };
 
+
+// const mapStateToProps = (state, props) => {
+//     return {
+//         name: state.userReducer.userName,
+//         password: state.userReducer.password
+//     }
+// }
+
+const mapStateToProps = (state) => {
+    console.log('Mapstateprps', state);
+    return state;
+}
+
+const mapDispatchToProps = (dispatch) => {
+    console.log(dispatch, updateUser, 'mapDispatch');
+    return {
+        updateUser
+    }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(Form);
+
+
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'flex-start',
     },
     btnEye: {
-        position: 'relative',
-        // top: 55,
-        // right: 28,
+        position: 'absolute',
+        zIndex: 99,
+        width: 25,
+        height: 25,
+        right: 50,
+        top: 180,
     },
     iconEye: {
         width: 25,
