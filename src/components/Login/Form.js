@@ -14,7 +14,6 @@ import { updateUser } from '../../actions/users-actions';
 // import user from '../../reducers/user/UserReducer';
 import { connect } from 'react-redux';
 
-
 class Form extends Component {
     constructor(props) {
         super(props);
